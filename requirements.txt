@@ -1,0 +1,6 @@
+# Movie Renamer Ultimate - Open Source Edition
+# Minimal dependencies for core rename functionality
+
+requests>=2.31.0
+python-dotenv>=1.0.0
+tkinterdnd2>=0.3.0
