@@ -6,9 +6,12 @@ A Python-based desktop application for automatically renaming movie files using 
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
+![Movie Renamer Ultimate - Dark Theme](pics/Main%20app%20window%20-%20dark%20theme.PNG)
+
 ## Features
 
 ✅ **Core Functionality:**
+
 - Automatic movie file and folder renaming using TMDB metadata
 - Smart filename parsing (removes quality markers, release groups, etc.)
 - Handles Roman numerals in sequel titles (Rocky IV, Blade II)
@@ -17,20 +20,33 @@ A Python-based desktop application for automatically renaming movie files using 
 - Dark/light theme support
 
 ✅ **TMDB Integration:**
+
 - Intelligent search with multiple fallback strategies
 - Manual override - double-click any preview to select different TMDB match
 - Caching for faster re-processing
 
 ✅ **User Interface:**
+
 - Filter by status (Found/Not Found)
 - Search bar for quick filtering
 - Live preview before renaming
 - Customizable naming patterns
 - Multi-language support
 
+## Screenshots
+
+![Rename Preview](pics/main%20app%20window%20-%20rename%20preview%20before_after.PNG)
+_Before/after rename preview with full TMDB metadata_
+
+![Settings Panel](pics/main%20app%20window%20-%20settings%20panel.PNG)
+_Settings panel with theme, language, and API key configuration_
+
+![Successful Rename](pics/main%20app%20window%20-%20successful%20rename%20completion%20dialog.PNG)
+_Rename completion dialog_
+
 ## What's NOT Included (Open Source Version)
 
-This is a simplified version focused on core rename functionality. For advanced features, check out the **[full version at movies.joshlehman.ca](https://movies.joshlehman.ca)**:
+This is a simplified version focused on core rename functionality. For advanced features, check out the **[full version at movie-renamer.joshlehman.ca](https://movie-renamer.joshlehman.ca)**:
 
 - ❌ NFO file generation for media centers
 - ❌ Automatic poster and fanart downloads
@@ -50,32 +66,37 @@ This is a simplified version focused on core rename functionality. For advanced 
 ### Steps
 
 1. **Clone the repository:**
-   ```bash
+
+```bash
    git clone https://github.com/joshl26/movie-renamer-ultimate.git
    cd movie-renamer-ultimate
-   ```
+```
 
 2. **Install dependencies:**
-   ```bash
+
+```bash
    pip install -r requirements_opensource.txt
-   ```
+```
 
 3. **Configure your TMDB API key:**
 
    Create a `.env` file in the project directory:
-   ```bash
-   cp .env.example .env
-   ```
 
-   Edit `.env` and add your API key:
-   ```
+```bash
+   cp .env.example .env
+```
+
+Edit `.env` and add your API key:
+
+```
    TMDB_API_KEY=your_actual_api_key_here
-   ```
+```
 
 4. **Run the application:**
-   ```bash
+
+```bash
    python main.py
-   ```
+```
 
 ## Usage
 
@@ -111,12 +132,14 @@ Available variables: `{title}`, `{year}`
 ## Example
 
 **Before:**
+
 ```
 The.Dark.Knight.2008.1080p.BluRay.x264-YIFY/
 └── The.Dark.Knight.2008.1080p.BluRay.x264-YIFY.mkv
 ```
 
 **After:**
+
 ```
 The Dark Knight (2008)/
 └── The Dark Knight (2008).mkv
@@ -132,6 +155,7 @@ The app intelligently cleans filenames by removing:
 - Audio formats (AAC, DTS, etc.)
 
 It also handles:
+
 - Year extraction from filenames
 - Roman numerals in titles (Rocky IV → searches both "Rocky IV" and "Rocky 4")
 - Multi-word titles with separators
@@ -163,19 +187,24 @@ Configuration files stored in your home directory:
 ## Troubleshooting
 
 ### "API key not configured"
+
 - Make sure your `.env` file exists and contains a valid TMDB API key
 - Restart the application after adding the key
 
 ### "No video files found"
+
 - Ensure files have supported extensions (mp4, mkv, avi, mov, flv)
-- Check that files aren't in hidden or system folders
+- Check that files aren't locked by another application
+- On Windows, try running as administrator
 
 ### "Permission denied"
+
 - Run the application with appropriate file system permissions
 - Check that files aren't locked by another application
 - On Windows, try running as administrator
 
 ### "No TMDB results found"
+
 - Verify internet connection
 - Check that the filename contains recognizable movie information
 - Try manually selecting the correct movie (double-click the entry)
@@ -183,6 +212,7 @@ Configuration files stored in your home directory:
 ## Development
 
 Built with:
+
 - **Python 3.x** - Core application
 - **tkinter** - GUI framework
 - **tkinterdnd2** - Drag-and-drop support
@@ -203,7 +233,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Full Version
 
-Want more features? The **[complete version](https://movies.joshlehman.ca)** includes:
+Want more features? The **[complete version](https://movie-renamer.joshlehman.ca)** includes:
 
 - 🎬 NFO file generation (Kodi/Plex/Jellyfin compatible)
 - 🖼️ Automatic poster and fanart downloads
@@ -213,7 +243,7 @@ Want more features? The **[complete version](https://movies.joshlehman.ca)** inc
 - 📊 Processing statistics
 - 📝 Full operation history
 
-Available at **[movies.joshlehman.ca](https://movies.joshlehman.ca)** - $19.99 one-time purchase.
+Available at **[movie-renamer.joshlehman.ca](https://movie-renamer.joshlehman.ca)** - $19.99 one-time purchase.
 
 ## Support
 
