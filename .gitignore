@@ -39,3 +39,7 @@ wheels/
 # Logs
 *.log
 .movie_renamer_*
+
+.venv
+
+.pytest_cache/

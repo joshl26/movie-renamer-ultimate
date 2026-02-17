@@ -7,6 +7,7 @@ from pathlib import Path
 import threading
 import json
 import pickle
+import webbrowser
 
 try:
     from dotenv import load_dotenv
@@ -47,6 +48,7 @@ class MovieRenamer:
 
         # Build UI
         self.setup_ui()
+        self.setup_drag_drop()
         self.load_window_state()
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -81,8 +83,9 @@ class MovieRenamer:
         """Setup ttk styles for dark mode"""
         style = ttk.Style()
 
-        # Dark scrollbar style
         style.theme_use('clam')
+
+        # --- Dark Scrollbar ---
         style.configure('Dark.Vertical.TScrollbar',
             background="#3d3d3d",
             troughcolor="#1e1e1e",
@@ -92,7 +95,7 @@ class MovieRenamer:
             arrowcolor="#ffffff"
         )
 
-        # Light scrollbar style
+        # --- Light Scrollbar ---
         style.configure('Light.Vertical.TScrollbar',
             background="#e0e0e0",
             troughcolor="#f0f0f0",
@@ -100,6 +103,56 @@ class MovieRenamer:
             lightcolor="#f0f0f0",
             darkcolor="#e0e0e0",
             arrowcolor="#000000"
+        )
+
+        # --- Dark Progressbar ---
+        style.configure('Dark.Horizontal.TProgressbar',
+            background="#0d47a1",
+            troughcolor="#2d2d2d",
+            bordercolor="#1e1e1e",
+            lightcolor="#0d47a1",
+            darkcolor="#0a3a80"
+        )
+
+        # --- Light Progressbar ---
+        style.configure('Light.Horizontal.TProgressbar',
+            background="#0d47a1",
+            troughcolor="#e0e0e0",
+            bordercolor="#c0c0c0",
+            lightcolor="#0d47a1",
+            darkcolor="#0a3a80"
+        )
+
+        # --- Dark Combobox ---
+        style.configure('Dark.TCombobox',
+            fieldbackground="#3d3d3d",
+            background="#3d3d3d",
+            foreground="#ffffff",
+            selectbackground="#0d47a1",
+            selectforeground="#ffffff",
+            bordercolor="#1e1e1e",
+            arrowcolor="#ffffff"
+        )
+        style.map('Dark.TCombobox',
+            fieldbackground=[('readonly', '#3d3d3d')],
+            background=[('readonly', '#3d3d3d')],
+            foreground=[('readonly', '#ffffff')]
+        )
+
+        # --- Light Combobox ---
+        style.configure('Light.TCombobox',
+            fieldbackground="#ffffff",
+            background="#e0e0e0",
+            foreground="#000000",
+            selectbackground="#0d47a1",
+            selectforeground="#ffffff",
+            bordercolor="#c0c0c0",
+            arrowcolor="#000000"
+        )
+        style.map('Light.TCombobox',
+            fieldbackground=[('readonly', '#ffffff')],
+            background=[('readonly', '#e0e0e0')],
+            foreground=[('readonly', '#000000')]
         )
 
     def load_theme_preference(self):
@@ -141,6 +194,19 @@ class MovieRenamer:
             self.root.configure(bg=self.light_bg)
         self.apply_status_color()
         self.save_theme_preference()
+
+    def toggle_dark_mode(self):
+        """Rebuild UI after dark/light mode toggle"""
+        self.save_theme_preference()
+        # Set root background immediately so no flash of wrong colour
+        bg = self.dark_bg if self.dark_mode.get() else self.light_bg
+        self.root.configure(bg=bg)
+        # Re-apply ttk styles for new mode
+        self.setup_styles()
+        # Destroy all child widgets and rebuild
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.setup_ui()
 
     def get_colors(self):
         """Get current theme colors"""
@@ -251,12 +317,13 @@ class MovieRenamer:
             import traceback
             traceback.print_exc()
 
+    def open_help(self):
+        """Open documentation in browser"""
+        webbrowser.open("https://movie-renamer.joshlehman.ca/docs")
+
     def setup_ui(self):
         """Setup the user interface"""
         colors = self.get_colors()
-
-        # Setup drag and drop
-        self.setup_drag_drop()
 
         # Top menu
         menu_frame = tk.Frame(self.root, bg=colors['bg'])
@@ -274,10 +341,11 @@ class MovieRenamer:
             ("Settings", self.show_settings, "Configure app settings"),
             ("Clear", self.clear, "Clear preview list"),
             ("Exit", self.on_closing, "Exit application"),
+            ("Help", self.open_help, "Open online documentation"),
         ]
 
         for text, cmd, tooltip in buttons:
-            btn = tk.Button(button_frame, text=text, command=cmd, width=12, bg=colors['button_bg'], fg=colors['button_fg'])
+            btn = tk.Button(button_frame, text=text, command=cmd, bg=colors['button_bg'], fg=colors['button_fg'], padx=8)
             btn.pack(side="left", padx=2)
             self.create_tooltip(btn, tooltip)
 
@@ -289,8 +357,9 @@ class MovieRenamer:
         self.apply_status_color()
 
         # Progress bar
-        self.progress = ttk.Progressbar(self.root, mode='determinate')
-        self.progress.pack(fill="x", padx=10, pady=5)
+        progress_style = 'Dark.Horizontal.TProgressbar' if self.dark_mode.get() else 'Light.Horizontal.TProgressbar'
+        self.progress = ttk.Progressbar(self.root, mode='determinate', style=progress_style)
+        self.progress.pack(fill="x", padx=10, pady=2)
 
         # Filter frame
         filter_frame = tk.Frame(self.root, bg=colors['bg'])
@@ -299,7 +368,8 @@ class MovieRenamer:
         tk.Label(filter_frame, text="Filter:", bg=colors['bg'], fg=colors['fg']).pack(side="left", padx=5)
 
         self.filter_var = tk.StringVar(value="All")
-        filter_combo = ttk.Combobox(filter_frame, textvariable=self.filter_var, values=["All", "Not Found", "Found"], width=15, state="readonly")
+        combo_style = 'Dark.TCombobox' if self.dark_mode.get() else 'Light.TCombobox'
+        filter_combo = ttk.Combobox(filter_frame, textvariable=self.filter_var, values=["All", "Not Found", "Found"], width=15, state="readonly", style=combo_style)
         filter_combo.pack(side="left", padx=5)
         filter_combo.bind("<<ComboboxSelected>>", lambda e: self.apply_filters())
 
@@ -323,6 +393,14 @@ class MovieRenamer:
         self.preview_list.pack(side="left", fill="both", expand=True)
         self.preview_list.bind('<Double-Button-1>', self.on_preview_double_click)
         scrollbar.config(command=self.preview_list.yview)
+
+        # Re-register drag and drop on the listbox after each UI rebuild
+        try:
+            from tkinterdnd2 import DND_FILES
+            self.preview_list.drop_target_register(DND_FILES)
+            self.preview_list.dnd_bind('<<Drop>>', self.on_drop)
+        except Exception:
+            pass
 
         # Buttons
         button_frame = tk.Frame(self.root, bg=colors['bg'])
@@ -450,7 +528,7 @@ class MovieRenamer:
 
         # Theme
         tk.Label(scrollable_frame, text="Appearance:", font=("Arial", 10, "bold"), bg=colors['bg'], fg=colors['fg']).pack(anchor="w", padx=10, pady=(10, 5))
-        tk.Checkbutton(scrollable_frame, text="Dark Mode", variable=self.dark_mode, bg=colors['bg'], fg=colors['fg']).pack(anchor="w", padx=10, pady=2)
+        tk.Checkbutton(scrollable_frame, text="Dark Mode", variable=self.dark_mode, command=self.toggle_dark_mode, bg=colors['bg'], fg=colors['fg'], selectcolor=colors['entry_bg'], activebackground=colors['bg']).pack(anchor="w", padx=10, pady=2)
 
         # API Key
         tk.Label(scrollable_frame, text="TMDB API Key:", font=("Arial", 10, "bold"), bg=colors['bg'], fg=colors['fg']).pack(anchor="w", padx=10, pady=(15, 5))
@@ -465,7 +543,7 @@ class MovieRenamer:
 
         # Language
         tk.Label(scrollable_frame, text="Language:", font=("Arial", 10, "bold"), bg=colors['bg'], fg=colors['fg']).pack(anchor="w", padx=10, pady=(15, 5))
-        lang_combo = ttk.Combobox(scrollable_frame, textvariable=self.language, values=["en", "es", "fr", "de", "pt", "ja", "zh"])
+        lang_combo = ttk.Combobox(scrollable_frame, textvariable=self.language, values=["en", "es", "fr", "de", "pt", "ja", "zh"], style='Dark.TCombobox' if self.dark_mode.get() else 'Light.TCombobox')
         lang_combo.pack(padx=10, pady=5)
 
         # Buttons
