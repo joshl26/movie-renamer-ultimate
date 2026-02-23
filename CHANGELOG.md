@@ -1,4 +1,7 @@
 ## 2026-02-23
+fix: use echo+cat temp file to safely prepend to CHANGELOG.md
+
+## 2026-02-23
 feat: expand supported video formats to full Kodi default list + add settings/theme tests
 
 ## 2026-02-17
