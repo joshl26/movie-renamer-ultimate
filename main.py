@@ -290,13 +290,21 @@ class MovieRenamer:
             # Handle both files and folders
             video_files = []
             for f in clean_files:
-                if os.path.isfile(f) and f.lower().endswith(('.mp4', '.mkv', '.avi', '.mov', '.flv')):
+                if os.path.isfile(f) and f.lower().endswith(('.mp4', '.mkv', '.avi', '.mov', '.flv', '.m2ts', '.m4v',
+                        '.3g2', '.3gp', '.asf', '.avc', '.avs', '.divx', '.dv', '.dvr-ms', '.evo', '.f4v', '.fli',
+                        '.m2t', '.m2v', '.mk3d', '.mpeg', '.mpg', '.mts', '.nuv', '.ogm', '.ogv', '.qt', '.rec',
+                        '.rm', '.rmvb', '.svq3', '.tp', '.trp', '.ts', '.ty', '.vc1', '.vdr', '.viv', '.vob',
+                        '.vp3', '.webm', '.wmv', '.wtv', '.xvid')):
                     video_files.append(f)
                     print(f"[DEBUG] Added video file: {f}")
                 elif os.path.isdir(f):
                     # Recursively find video files in dropped folder
                     print(f"[DEBUG] Scanning folder for videos: {f}")
-                    for ext in ('mp4', 'mkv', 'avi', 'mov', 'flv'):
+                    for ext in ('mp4', 'mkv', 'avi', 'mov', 'flv', 'm2ts', 'm4v',
+                                '3g2', '3gp', 'asf', 'avc', 'avs', 'divx', 'dv', 'dvr-ms', 'evo', 'f4v', 'fli',
+                                'm2t', 'm2v', 'mk3d', 'mpeg', 'mpg', 'mts', 'nuv', 'ogm', 'ogv', 'qt', 'rec',
+                                'rm', 'rmvb', 'svq3', 'tp', 'trp', 'ts', 'ty', 'vc1', 'vdr', 'viv', 'vob',
+                                'vp3', 'webm', 'wmv', 'wtv', 'xvid'):
                         found = list(Path(f).glob(f'**/*.{ext}'))
                         found.extend(list(Path(f).glob(f'**/*.{ext.upper()}')))
                         for vf in found:
@@ -733,7 +741,7 @@ class MovieRenamer:
     def browse_files(self):
         files = filedialog.askopenfilenames(
             title="Select Movie Files",
-            filetypes=[("Video Files", "*.mp4 *.mkv *.avi *.mov *.flv")],
+            filetypes=[("Video Files", "*.mp4 *.mkv *.avi *.mov *.flv *.m2ts *.m4v *.3g2 *.3gp *.asf *.avc *.avs *.divx *.dv *.dvr-ms *.evo *.f4v *.fli *.m2t *.m2v *.mk3d *.mpeg *.mpg *.mts *.nuv *.ogm *.ogv *.qt *.rec *.rm *.rmvb *.svq3 *.tp *.trp *.ts *.ty *.vc1 *.vdr *.viv *.vob *.vp3 *.webm *.wmv *.wtv *.xvid")],
             initialdir=self.last_folder if self.last_folder else None
         )
         if files:
@@ -753,7 +761,11 @@ class MovieRenamer:
             self.save_last_folder(folder)
             self.last_folder = folder
             files = []
-            video_extensions = ('mp4', 'mkv', 'avi', 'mov', 'flv')
+            video_extensions = ('mp4', 'mkv', 'avi', 'mov', 'flv', 'm2ts', 'm4v',
+                                '3g2', '3gp', 'asf', 'avc', 'avs', 'divx', 'dv', 'dvr-ms', 'evo', 'f4v', 'fli',
+                                'm2t', 'm2v', 'mk3d', 'mpeg', 'mpg', 'mts', 'nuv', 'ogm', 'ogv', 'qt', 'rec',
+                                'rm', 'rmvb', 'svq3', 'tp', 'trp', 'ts', 'ty', 'vc1', 'vdr', 'viv', 'vob',
+                                'vp3', 'webm', 'wmv', 'wtv', 'xvid')
 
             for ext in video_extensions:
                 files.extend(Path(folder).glob(f"**/*.{ext}"))
