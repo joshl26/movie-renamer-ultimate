@@ -1,3 +1,6 @@
+## 2026-03-01
+refactor: split monolithic main.py into modular package structure + fix runtime bugs + expand test suite
+
 ## 2026-02-23
 fix: use echo+cat temp file to safely prepend to CHANGELOG.md
 
