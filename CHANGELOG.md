@@ -1,4 +1,7 @@
 ## 2026-03-02
+fix: install imagemagick in linux CI jobs + guard icon cp with || true
+
+## 2026-03-02
 feat: linux build support, dialog z-ordering, font readability, always-on-top
 
 ## 2026-03-01
