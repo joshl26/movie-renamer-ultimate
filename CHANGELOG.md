@@ -1,3 +1,6 @@
+## 2026-03-02
+feat: linux build support, dialog z-ordering, font readability, always-on-top
+
 ## 2026-03-01
 refactor: split monolithic main.py into modular package structure + fix runtime bugs + expand test suite
 
