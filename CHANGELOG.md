@@ -1,3 +1,6 @@
+## 2026-03-03
+refactor: split free-demo into modular package + fix tk bugs + add smoke tests
+
 ## 2026-03-02
 fix: install imagemagick in linux CI jobs + guard icon cp with || true
 
