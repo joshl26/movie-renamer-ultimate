@@ -1,3 +1,6 @@
+## 2026-03-16
+ci: use supported xz compression for Linux AppImages
+
 ## 2026-03-03
 refactor: split free-demo into modular package + fix tk bugs + add smoke tests
 
