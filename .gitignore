@@ -43,3 +43,4 @@ wheels/
 .venv
 
 .pytest_cache/
+test-movie

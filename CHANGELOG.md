@@ -1,3 +1,6 @@
+## 2026-03-17
+feat: marketing materials produced
+
 ## 2026-03-16
 ci: use supported xz compression for Linux AppImages
 
