@@ -1,4 +1,7 @@
 ## 2026-03-19
+feat(learning-engine): add adaptive filename learning engine (paid + free-demo)
+
+## 2026-03-19
 fix(parsing): correct year-in-title matching for films like Blade Runner 2049
 
 ## 2026-03-17
