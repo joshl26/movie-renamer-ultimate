@@ -1,3 +1,6 @@
+## 2026-03-19
+fix(parsing): correct year-in-title matching for films like Blade Runner 2049
+
 ## 2026-03-17
 feat: marketing materials produced
 

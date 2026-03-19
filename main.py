@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 import tkinter as tk
@@ -15,6 +16,9 @@ try:
 except ImportError:
     DOTENV_AVAILABLE = False
     print("[DEBUG] python-dotenv not installed. Install with: pip install python-dotenv")
+
+_CURRENT_YEAR = datetime.date.today().year
+
 
 class MovieRenamer:
     def __init__(self, root, api_key):
@@ -594,26 +598,41 @@ class MovieRenamer:
 
         # Extract year from parentheses first (highest priority)
         year_match = re.search(r'\((\d{4})\)', name)
-        year = year_match.group(1) if year_match else None
+        year = year_match.group(1) if year_match and 1888 <= int(year_match.group(1)) <= _CURRENT_YEAR + 1 else None
 
-        # If no year in parentheses, look for standalone 4-digit year (1900-2100)
+        # If no year in parentheses, look for standalone 4-digit year
         if not year:
-            year_match = re.search(r'(?:^|\D)([12]\d{3})(?:\D|$)', name)
-            if year_match:
+            year_match = re.search(r'[._\s-]([12]\d{3})[._\s-]', name)
+            if year_match and 1888 <= int(year_match.group(1)) <= _CURRENT_YEAR + 1:
                 year = year_match.group(1)
 
         # Clean the name step by step
         clean_name = re.sub(r'\(\d{4}\)', '', name).strip()  # Remove (YYYY)
         clean_name = re.sub(r'[\[\{].*?[\]\}]', '', clean_name).strip()  # Remove [brackets] and {braces}
 
-        # Remove year numbers if not captured above (1900-2100)
-        clean_name = re.sub(r'\b[12]\d{3}\b', '', clean_name).strip()
+        # Remove year numbers with plausibility check
+        def _drop_if_year(match):
+            token = match.group()
+            n = int(token)
+            if not (1888 <= n <= _CURRENT_YEAR + 1):
+                return token
+            if year and token == year:
+                return ''
+            return '' if match.string[:match.start()].strip() else token
 
-        # Remove common usernames/release groups (must be preceded by separator)
-        clean_name = re.sub(r'[\._-](rarbg|anoXmous|scene|proper|rerip|remux)(?:\.|_|-|$)', ' ', clean_name, flags=re.IGNORECASE).strip()
+        clean_name = re.sub(r'\b[12]\d{3}\b', _drop_if_year, clean_name)
+        clean_name = ' '.join(clean_name.split())
+
+        # Technical scene markers only — no hardcoded release group names
+        clean_name = re.sub(r'[\._-](proper|rerip|remux)(?:\.|_|-|$)', ' ', clean_name, flags=re.IGNORECASE).strip()
 
         # Remove quality markers and common release tags
         quality_markers = r'\b(1080p|720p|480p|2160p|4k|uhd|bluray|blu-ray|bdrip|webrip|hdtv|dvdrip|h\.?264|x\.?264|hevc|h\.?265|x\.?265|aac|ac3|dts|amd64|x86_64|10bit|avc|vc1|mpeg2|aiff|flac|opus|vorbis|mp3|eac3|truehd|dts-hd|atmos|imax|remastered|extended|directors?cut|uncut|proper|rerip|remux|pdtv|dsr|ts|tc|r5|dvdscr|brrip|xvid|divx|h264|x264|web|web-dl|web-rip)\b'
+
+        # Strip trailing -GROUP when quality markers are present (Tier 1 structural fix)
+        if re.search(quality_markers, clean_name, re.IGNORECASE):
+            clean_name = re.sub(r'-[A-Za-z][A-Za-z0-9]*$', '', clean_name).strip()
+
         clean_name = re.sub(quality_markers, '', clean_name, flags=re.IGNORECASE).strip()
 
         clean_name = re.sub(r'[._-]+', ' ', clean_name).strip()  # Convert dots/dashes/underscores to spaces
@@ -808,12 +827,12 @@ class MovieRenamer:
 
             # Extract year from parentheses first (highest priority)
             year_match = re.search(r'\((\d{4})\)', name)
-            year = year_match.group(1) if year_match else None
+            year = year_match.group(1) if year_match and 1888 <= int(year_match.group(1)) <= _CURRENT_YEAR + 1 else None
 
-            # If no year in parentheses, look for standalone 4-digit year (1900-2100)
-            if not year and re.search(r'[._\s-]([12]\d{3})[._\s-]', name):
+            # If no year in parentheses, look for standalone 4-digit year
+            if not year:
                 year_match = re.search(r'[._\s-]([12]\d{3})[._\s-]', name)
-                if year_match:
+                if year_match and 1888 <= int(year_match.group(1)) <= _CURRENT_YEAR + 1:
                     year = year_match.group(1)
                     print(f"[DEBUG] Found year in filename: {year}")
 
@@ -821,14 +840,29 @@ class MovieRenamer:
             clean_name = re.sub(r'\(\d{4}\)', '', name).strip()  # Remove (YYYY)
             clean_name = re.sub(r'[\[\{].*?[\]\}]', '', clean_name).strip()  # Remove [brackets] and {braces}
 
-            # Remove year numbers if not captured above (1900-2100)
-            clean_name = re.sub(r'\b[12]\d{3}\b', '', clean_name).strip()
+            # Remove year numbers with plausibility check
+            def _drop_if_year(match):
+                token = match.group()
+                n = int(token)
+                if not (1888 <= n <= _CURRENT_YEAR + 1):
+                    return token
+                if year and token == year:
+                    return ''
+                return '' if match.string[:match.start()].strip() else token
 
-            # Remove common usernames/release groups
-            clean_name = re.sub(r'[\._-](rarbg|anoXmous|scene|proper|rerip|remux)(?:\.|_|-|$)', ' ', clean_name, flags=re.IGNORECASE).strip()
+            clean_name = re.sub(r'\b[12]\d{3}\b', _drop_if_year, clean_name)
+            clean_name = ' '.join(clean_name.split())
+
+            # Technical scene markers only — no hardcoded release group names
+            clean_name = re.sub(r'[\._-](proper|rerip|remux)(?:\.|_|-|$)', ' ', clean_name, flags=re.IGNORECASE).strip()
 
             # Remove quality markers and common release tags
             quality_markers = r'\b(1080p|720p|480p|2160p|4k|uhd|ultraHD|UltraHD|bluray|blu-ray|bdrip|webrip|hdtv|dvdrip|h\.?264|x\.?264|hevc|h\.?265|x\.?265|aac|ac3|dts|amd64|x86_64|10bit|avc|vc1|mpeg2|aiff|flac|opus|vorbis|mp3|eac3|truehd|dts-hd|atmos|imax|remastered|extended|directors?cut|uncut|proper|rerip|remux|pdtv|dsr|ts|tc|r5|dvdscr|brrip|xvid|divx|h264|x264|web|web-dl|web-rip)\b'
+
+            # Strip trailing -GROUP when quality markers are present (Tier 1 structural fix)
+            if re.search(quality_markers, clean_name, re.IGNORECASE):
+                clean_name = re.sub(r'-[A-Za-z][A-Za-z0-9]*$', '', clean_name).strip()
+
             clean_name = re.sub(quality_markers, '', clean_name, flags=re.IGNORECASE).strip()
 
             clean_name = re.sub(r'[._-]+', ' ', clean_name).strip()  # Convert dots/dashes/underscores to spaces
